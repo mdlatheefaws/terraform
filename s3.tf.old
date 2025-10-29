@@ -1,0 +1,8 @@
+resource "aws_s3_bucket" "ladsoft_terraform_s3" {
+  bucket = "ladsoftterarforms3"
+
+  tags = {
+    Name        = "ladsoftterarforms3"
+    Environment = "PROD"
+  }
+}
