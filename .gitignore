@@ -3,3 +3,5 @@
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfvarsgit 
+index.html
+s3.tf.old
