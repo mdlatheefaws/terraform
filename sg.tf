@@ -1,31 +1,36 @@
-resource "aws_security_group" "Demo_vpc_SG" {
- #name   = "Demo_vpc_SG"
-  vpc_id = aws_vpc.Demo_vpc.id
-  tags = {
-    Name = var.sg-name
+resource "aws_security_group" "k8s_sg" {
+  name        = "k8s-sg-${var.name_suffix}"
+  description = "k8s nodes sg"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # tighten to your IP!
   }
 
-  ingress  {
-  #description = "allow_ssh"  
-  cidr_blocks   = [var.cidr_blocks]
-  from_port   = var.from_port
-  to_port     = var.to_port
-  protocol = var.pro-ssh
-    }
-    
-ingress  {
-  description = "allow_ICMP"  
-  cidr_blocks   = ["0.0.0.0/0"]
-  from_port   = var.from_port_icmp
-  to_port     = var.to_port_icmp
-  protocol = "icmp"
-    }
-
-egress  {
-description = "all_allow"
-from_port = 0
-to_port = 0
-protocol = "-1"
-cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # API server reachable (change to narrow if you want)
   }
+
+  # node <-> node full
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "k8s-sg-${var.name_suffix}" }
 }
